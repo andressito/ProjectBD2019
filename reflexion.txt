@@ -1,0 +1,34 @@
+sites d'application offrants des services de dev à des projets
+organisation : appel aux dons, prises de participations
+les users: le beneficiaire,l'intermédiaire et le donnateur
+
+intermédiaire: se rémunèrent grace à des commissions directes ou indirectes
+
+malade ou project de levée de fond pour les start up informatique
+
+les utilisateurs:
+	beneficiaire : les membres du start up
+	intermediaire: le site
+	donnateur: les membres du sites
+
+mise en place d'un nouveau projet :
+	fait par les beneficiaires
+	titre
+	description
+	date debut
+	date fin
+	montant a collecter
+
+commission (5% de chaque dons)
+participation au choix du du bénéficiaire
+
+(idee de nassim reversait l'argent à une assos)
+
+cloture projet : 
+	atteint meme s'il reste des jours, le projet est clos
+	si pas atteint ==> decider de prolonger son delais (juste une fois)
+				   ==> ou de prendre l'argent
+
+archivage : archivage du projet 
+
+
