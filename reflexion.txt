@@ -31,4 +31,41 @@ cloture projet :
 
 archivage : archivage du projet 
 
+beneficiaire 
+	id
+	nom
+	prenom
 
+
+paricipant
+	id
+	nom
+	prenom
+
+
+projet:
+	id
+	titre
+	desciption
+	montant
+	datedebut
+	datefin
+	id beneficiare
+
+
+don
+	id don
+	id projet
+	id participant
+	montant
+	dateDon
+
+commission
+	id commission
+	id don
+	montant
+
+
+archives
+	id archives
+	id projet
