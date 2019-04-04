@@ -1,0 +1,29 @@
+tables USER:
+  **beneficiaire:
+      id
+      username
+      email
+      password
+
+  **participants:
+      id
+      username
+      email
+
+  (**intermediaires a voir apres)
+
+table projet:
+    id
+    titre
+    description
+    date debut
+    date fin
+    montant collecté
+    montant global
+
+table faireUnDon:
+    id don
+    #id participant
+    #id projet
+    montant
+    date courante
