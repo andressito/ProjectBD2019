@@ -7,13 +7,12 @@ création tables => faite
 
 après insertion des données des Personnes (expert developpeur beneficiaire Local)
 
-fonction getDate() appelée pour champs date table Proposer Archive
-triggers =>   après création d'un projet insertion d'une proposition
+I) fonction getDate() appelée pour champs date table Proposer Archive
+   triggers =>   après création d'un projet insertion d'une proposition
 							et arpès insert into projet nombreProjet++
  							(trigger after inster into projet)
-				=>   après insert into proposer Archive(PROPOSITION)
+						=>   après insert into proposer Archive(PROPOSITION)
 
-				=> après ETUDE check decision ?= false supprimer le projet (trigger)
-				=> après ETUDE check decision ?= true Attribuer local (trigger) Archive(ATTRIBUTION)
-
-				
+				    => après ETUDE check decision ?= false supprimer le projet (trigger)
+				    => après ETUDE check decision ?= true Attribuer local (trigger) Archive(ATTRIBUTION)
+I) => fait
