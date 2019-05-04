@@ -1,20 +1,21 @@
-CREATE OR REPLACE FUNCTION delaiFini() RETURNS BOOLEAN AS $$
+CREATE OR REPLACE FUNCTION delaiFini(finProjet TIMESTAMP , now TIMESTAMP) RETURNS BOOLEAN AS $$
 BEGIN
-
+    IF ((finProjet::TIMESTAMP - now::TIMESTAMP) = '00:00:00') THEN
+      RETURN TRUE;
+    ELSE
+      RETURN FALSE;
+    END IF;
 END;
 $$ language plpgsql;
 
-
-
 CREATE OR REPLACE FUNCTION getCurrentDate() RETURNS TIMESTAMP AS $$
 BEGIN
-    return (SELECT dateCourante FROM DateCourante);
+    RETURN (SELECT dateCourante FROM DateCourante);
 END
 $$ language plpgsql;
 
 CREATE OR REPLACE FUNCTION proposerProjet() RETURNS TRIGGER AS $$
 BEGIN
-
     IF (TG_OP = 'DELETE') THEN
         INSERT INTO Archive SELECT 'SUPRESSION', getCurrentDate(), OLD.*;
         RETURN NULL;
@@ -45,14 +46,14 @@ BEGIN
         RETURN NEW;
     ELSE
         DELETE FROM Projet
-        WHERE idProjet = NEW.idProjetEtude;
+        WHERE idProjet = NEW.idProjet;
         RETURN NULL;
     END IF;
 END;
 $$ language plpgsql;
 
 CREATE TRIGGER tApresEtude
-    AFTER INSERT ON Etude
+    AFTER INSERT ON EtudeProjet
     FOR EACH ROW EXECUTE PROCEDURE apresEtude();
 
 CREATE OR REPLACE FUNCTION apresAttribution() RETURNS TRIGGER AS $$
@@ -68,10 +69,10 @@ CREATE TRIGGER tApresAttribution
 
 CREATE OR REPLACE FUNCTION misAjour() RETURNS TRIGGER AS $$
 BEGIN
-
+  --à continuer demain
 END;
 $$ language plpgsql;
 
 CREATE TRIGGER tMisAjour
-    AFTER UPDATE ON DateCourante
+    AFTER UPDATE OF dateCourante ON DateCourante
     FOR EACH ROW EXECUTE PROCEDURE misAjour();
