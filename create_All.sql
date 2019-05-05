@@ -25,7 +25,7 @@ CREATE TABLE Personne(
 
 CREATE TABLE Expert(
   dateEmbauche timestamp,
-  salaire      INTEGER NOT NULL,
+  salaire      INTEGER NOT NULL DEFAULT 2000,
   fonction     varchar not null check (fonction in ('DECISION','CODEUR'))
 )INHERITS (Personne);
 
@@ -34,24 +34,24 @@ CREATE TABLE Developpeur(
 )INHERITS (Personne);
 
 CREATE TABLE Beneficiaire(
-  status   VARCHAR DEFAULT 'Debutant',
   benefice integer default 0
 )INHERITS (Personne);
 
 CREATE TABLE Projet(
   idProjet    SERIAL PRIMARY KEY,
+  idPersonne  INTEGER references Personne(idPersonne) ON DELETE CASCADE,
   nom         VARCHAR,
   description VARCHAR,
   dateDebut   TIMESTAMP,
   dateFin     TIMESTAMP,
-  budget      INTEGER,
+  budget      INTEGER DEFAULT 0,
   reussite    boolean default false
 );
 
 CREATE TABLE Local(
   idLocal  SERIAL PRIMARY KEY,
   capacite INTEGER,
-  occuper  boolean default false
+  libre  boolean default TRUE
 );
 
 CREATE TABLE EtudeProjet(
@@ -66,17 +66,17 @@ CREATE TABLE EtudeProjet(
 );
 
 CREATE TABLE Participer(
-  idParticiper SERIAL PRIMARY KEY,
-  date         timestamp,
-  don          integer default 0,
   idPersonne   integer references Personne(idPersonne) ON DELETE CASCADE,
-  idProjet     integer references Projet(idProjet) ON DELETE CASCADE
+  idProjet     integer references Projet(idProjet) ON DELETE CASCADE,
+  dateDon      timestamp,
+  don          integer default 10,
+  PRIMARY KEY (idPersonne,idProjet)
 );
 
 create table Proposer(
   idBeneficiare integer references Personne(idPersonne)ON DELETE CASCADE,
-  date          timestamp,
   idProjet      integer references Projet(idProjet) ON DELETE CASCADE,
+  dateProp      timestamp,
   PRIMARY KEY (idBeneficiare,idProjet)
 );
 
