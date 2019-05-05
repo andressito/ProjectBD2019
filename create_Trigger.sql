@@ -1,11 +1,11 @@
-CREATE OR REPLACE FUNCTION misAjourStatuDev(idP SERIAL, s VARCHAR) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION misAjourStatuDev(idP INTEGER, s VARCHAR) RETURNS VOID AS $$
 BEGIN
     UPDATE Developpeur SET status = s
     WHERE idPersonne = idP;
 END;
 $$ language plpgsql;
 
-CREATE OR REPLACE FUNCTION misAjourNbProjet(idP SERIAL) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION misAjourNbProjet(idP INTEGER) RETURNS VOID AS $$
 DECLARE
 	nbProjet INTEGER;
 
@@ -18,37 +18,37 @@ BEGIN
     WHERE idPersonne = idP;
 
     IF (10 < nbProjet) THEN
-        misAjourStatuDev(idP, 'Amateur');
+        EXECUTE misAjourStatuDev(idP, 'Amateur');
         RAISE notice 'Developpeur % est devenu Amateur', idP;
     ELSIF (40 < nbProjet) THEN
-        changementStatuDev(idP);
+        EXECUTE changementStatuDev(idP);
     END IF;
 
 END;
 $$ language plpgsql;
 
-CREATE OR REPLACE FUNCTION misAjourBudget(idP SERIAL, montant INTEGER) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION misAjourBudget(idP INTEGER, montant INTEGER) RETURNS VOID AS $$
 BEGIN
     UPDATE Projet SET budget = (budget + montant)
     WHERE idProjet = idP;
 END;
 $$ language plpgsql;
 
-CREATE OR REPLACE FUNCTION estDeveloppeur(idP SERIAL) RETURNS BOOLEAN AS $$
+CREATE OR REPLACE FUNCTION estDeveloppeur(idP INTEGER) RETURNS BOOLEAN AS $$
 BEGIN
     RETURN (0 < (SELECT count(*) FROM Developpeur
             WHERE idPersonne = idP));
 END;
 $$ language plpgsql;
 
-CREATE OR REPLACE FUNCTION localEstLibre(idL SERIAL) RETURNS BOOLEAN AS $$
+CREATE OR REPLACE FUNCTION localEstLibre(idL INTEGER) RETURNS BOOLEAN AS $$
 BEGIN
     RETURN (SELECT libre FROM Local
             WHERE idLocal = idL);
 END;
 $$ language plpgsql;
 
-CREATE OR REPLACE FUNCTION libererLocal(idL SERIAL, BOOLEAN etat) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION libererLocal(idL INTEGER, etat BOOLEAN) RETURNS VOID AS $$
 BEGIN
 
     IF (etat) THEN
@@ -63,36 +63,33 @@ BEGIN
 END;
 $$ language plpgsql;
 
-CREATE OR REPLACE FUNCTION changementStatuDev(idD SERIAL) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION changementStatuDev(idD INTEGER) RETURNS VOID AS $$
 BEGIN
     with p as (
       SELECT * FROM Developpeur
       WHERE idPersonne = idD
     )
-
-    RAISE notic 'Le Developpeur % \n nom: % , prenom: % \n Integre notre équipe de CODEUR'
-                , p.idPersonne, p.nom, p.prenom;
-
     INSERT INTO Expert (idPersonne, nom, prenom, email, dateEmbauche, fonction)
     VALUES (p.idPersonne, p.nom, p.prenom, p.email, getCurrentDate(), 'CODEUR');
+
+    RAISE NOTICE 'Le Developpeur % Integre notre équipe de CODEUR', idD;
 
     DELETE FROM Developpeur
     WHERE idPersonne = idD;
 END;
 $$ language plpgsql;
 
-CREATE OR REPLACE FUNCTION changementStatuBenef(idB SERIAL) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION changementStatuBenef(idB INTEGER) RETURNS VOID AS $$
 BEGIN
     with p as (
       SELECT * FROM Beneficiaire
       WHERE idPersonne = idB
     )
 
-    RAISE notic 'Le beneficiaire % \n nom: % , prenom: % \n Integre notre équipe de DECISION'
-                , p.idPersonne, p.nom, p.prenom;
-
     INSERT INTO Expert (idPersonne, nom, prenom, email, dateEmbauche, fonction)
     VALUES (p.idPersonne, p.nom, p.prenom, p.email, getCurrentDate(), 'DECISION');
+
+    RAISE NOTICE 'Le beneficiaire % Integre notre équipe de DECISION', idB;
 
     DELETE FROM Beneficiaire
     WHERE idPersonne = idB;
@@ -129,11 +126,10 @@ CREATE OR REPLACE FUNCTION fOnProjet() RETURNS TRIGGER AS $$
 DECLARE
   budgetP  INTEGER;
   budgetEt INTEGER;
-  nbProjet INTEGER;
 BEGIN
     IF (TG_OP = 'DELETE') THEN
 
-        INSERT INTO Archive SELECT 'SUPRESSION', getCurrentDate(), OLD.*;
+        INSERT INTO Archive SELECT 'SUPRESSION', getCurrentDate(), OLD.idProjet;
         RETURN NULL;
 
     ELSIF (TG_OP = 'UPDATE') THEN
@@ -150,23 +146,38 @@ BEGIN
         END IF;
         RETURN NEW;
 
-    ELSIF (TG_OP = 'INSERT') THEN
-
-        UPDATE Personne SET nombreProjet = nombreProjet + 1
-                        WHERE idPersonne = NEW.idPersonne;
-
-        INSERT INTO Archive SELECT 'PROPOSITION', getCurrentDate(), NEW.*;
-        INSERT INTO Proposer SELECT NEW.idPersonne, NEW.idProjet, getCurrentDate();
-
-        RETURN NEW;
     END IF;
     RETURN NULL;
 END;
 $$ language plpgsql;
 
 CREATE TRIGGER tOnProjet
-    AFTER INSERT OR UPDATE OR DELETE ON Projet
+    AFTER UPDATE OR DELETE ON Projet
     FOR EACH ROW EXECUTE PROCEDURE fOnProjet();
+
+CREATE OR REPLACE FUNCTION fOnProposer() RETURNS TRIGGER AS $$
+DECLARE
+  nbProjet INTEGER;
+BEGIN
+
+    INSERT INTO Archive SELECT 'PROPOSITION', getCurrentDate(), NEW.*;
+
+    UPDATE Personne SET nombreProjet = nombreProjet + 1
+                    WHERE idPersonne = NEW.idBeneficiare;
+
+    SELECT nombreProjet INTO nbProjet FROM Personne
+    WHERE idPersonne = NEW.idBeneficiare;
+
+    IF (10 < nbProjet) THEN
+        EXECUTE changementStatuBenef(NEW.idBeneficiare);
+    END IF;
+    RETURN NEW;--
+END;
+$$ language plpgsql;
+
+CREATE TRIGGER tOnProposer
+    AFTER INSERT ON Proposer
+    FOR EACH ROW EXECUTE PROCEDURE fOnProposer();
 
 CREATE OR REPLACE FUNCTION apresEtude() RETURNS TRIGGER AS $$
 BEGIN
@@ -195,6 +206,21 @@ $$ language plpgsql;
 
 CREATE TRIGGER tApresAttribution
     AFTER INSERT ON AttribuerLocal
+    FOR EACH ROW EXECUTE PROCEDURE apresEtude();
+
+
+CREATE OR REPLACE FUNCTION avantAttribution() RETURNS TRIGGER AS $$
+BEGIN
+    IF (localEstLibre(OLD.idLocal)) THEN
+        RETURN NEW;
+    ELSE
+        RETURN NULL;
+    END IF;
+END;
+$$ language plpgsql;
+
+CREATE TRIGGER tAvantAttribution
+    BEFORE INSERT ON AttribuerLocal
     FOR EACH ROW EXECUTE PROCEDURE apresEtude();
 
 CREATE OR REPLACE FUNCTION misAjour() RETURNS TRIGGER AS $$

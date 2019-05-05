@@ -39,7 +39,6 @@ CREATE TABLE Beneficiaire(
 
 CREATE TABLE Projet(
   idProjet    SERIAL PRIMARY KEY,
-  idPersonne  INTEGER references Personne(idPersonne) ON DELETE CASCADE,
   nom         VARCHAR,
   description VARCHAR,
   dateDebut   TIMESTAMP,
@@ -57,10 +56,9 @@ CREATE TABLE Local(
 CREATE TABLE EtudeProjet(
   idExpert    integer REFERENCES  Personne(idPersonne) ON DELETE CASCADE,
   idProjet    integer REFERENCES Projet(idProjet) ON DELETE CASCADE,
-  idLocal     integer REFERENCES Local(idLocal) ON DELETE CASCADE,
   decision    boolean not null,
   dateEtude   TIMESTAMP not null,
-  budget      integer ,
+  budget      integer,
   duree       integer,
   PRIMARY KEY (idExpert,idProjet)
 );
