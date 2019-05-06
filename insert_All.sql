@@ -29,3 +29,6 @@ insert into Projet (nom,description) values ('coavionnage','site de coavionnage 
   et passagers');
 insert into Projet (nom,description) values ('lecteur RSS','application pour lire les flux rss');
 insert into Projet (nom,description) values ('jeu de dame','application de jeu de dame et echec');
+
+--Proposer
+insert into Proposer values (1, 1, '2018-06-05 20:00:00');

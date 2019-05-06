@@ -26,25 +26,24 @@ CREATE TABLE Personne(
 CREATE TABLE Expert(
   idExpert SERIAL PRIMARY KEY,
   dateEmbauche timestamp,
-  salaire INTEGER NOT NULL,
+  salaire INTEGER NOT NULL DEFAULT 2000,
   fonction varchar not null check ( fonction in ('DECISION','CODEUR'))
 )INHERITS (Personne);
 
 CREATE TABLE Developpeur(
   idDeveloppeur SERIAL PRIMARY KEY,
-  status VARCHAR DEFAULT 'Debutant'
+  status VARCHAR DEFAULT 'Debutant' NOT NULL
 )INHERITS (Personne);
 
 CREATE TABLE Beneficiaire(
     idBeneficiare SERIAL PRIMARY KEY,
-    status VARCHAR DEFAULT 'Debutant',
     benefice integer default 0
 )INHERITS (Personne);
 
 CREATE TABLE Projet(
   idProjet    SERIAL PRIMARY KEY,
-  nom         VARCHAR,
-  description VARCHAR,
+  nom         VARCHAR NOT NULL,
+  description VARCHAR NOT NULL,
   dateDebut   TIMESTAMP,
   dateFin     TIMESTAMP,
   budget      INTEGER DEFAULT 0,
@@ -63,8 +62,8 @@ CREATE TABLE EtudeProjet(
   idProjet    integer REFERENCES Projet(idProjet) ON DELETE CASCADE,
   decision    boolean not null,
   dateEtude   TIMESTAMP not null,
-  budget      integer,
-  duree       integer,
+  budget      integer NOT NULL,
+  duree       integer NOT NULL,
   PRIMARY KEY (idExpert,idProjet)
 );
 
@@ -94,87 +93,5 @@ CREATE TABLE AttribuerLocal(
   dateAttribution timestamp,
   idLocal         integer references Local(idLocal) ON DELETE CASCADE,
   idProjet        integer references Projet(idProjet) ON DELETE CASCADE,
-  primary key (idLocal,idProjet)
-);
-CREATE TABLE Personne(
-  idPersonne SERIAL PRIMARY KEY,
-  nom VARCHAR NOT NULL,
-  prenom VARCHAR NOT NULL,
-  email VARCHAR NOT NULL ,
-  nombreProjet integer default 0
-);
-
-CREATE TABLE Expert(
-  idExpert SERIAL PRIMARY KEY,
-  dateEmbauche timestamp not null,
-  salaire INTEGER NOT NULL,
-  fonction varchar not null check ( fonction in ('DECISION','CODEUR'))
-)INHERITS (Personne);
-
-CREATE TABLE Developpeur(
-  idDeveloppeur SERIAL PRIMARY KEY,
-  status VARCHAR DEFAULT 'Debutant' not null
-)INHERITS (Personne);
-
-CREATE TABLE Beneficiaire(
-    idBeneficiare SERIAL PRIMARY KEY,
-    status VARCHAR DEFAULT 'Debutant' NOT null,
-    benefice integer default 0
-)INHERITS (Personne);
-
-CREATE TABLE Projet(
-  idProjet SERIAL PRIMARY KEY,
-  nom VARCHAR not null,
-  description VARCHAR not null,
-  dateDebut TIMESTAMP,
-  dateFin TIMESTAMP,
-  budget INTEGER,
-  reussite boolean default false
-);
-
-CREATE TABLE EtudeProjet(
-    idExpert       integer REFERENCES  Personne(idPersonne) ON DELETE CASCADE,
-    idProjetEtude INTEGER REFERENCES Projet(idProjet) ON DELETE CASCADE,
-    decision    boolean not null,
-    dateEtude     TIMESTAMP not null,
-    budget integer not null,
-    duree integer not null,
-    PRIMARY KEY (idExpert,idProjetEtude)
-);
-
-CREATE TABLE Participer(
-    idPersonne integer references Personne(idPersonne) ON DELETE CASCADE,
-    idProjet integer references Projet(idProjet) ON DELETE CASCADE,
-    date timestamp not null,
-    don integer default 0,
-    PRIMARY KEY(idPersonne,idProjet)
-);
-
-create table Proposer(
-    idPersonne integer references Personne(idPersonne)ON DELETE CASCADE,
-    idProjet integer references Projet(idProjet) ON DELETE CASCADE,
-    date timestamp not null,
-    PRIMARY KEY (idBeneficiare,idProjet)
-);
-
-CREATE TABLE Local(
-  idLocal SERIAL PRIMARY KEY,
-  capacite INTEGER not null,
-  nom VARCHAR not null,
-  libre boolean default false
-);
-
-CREATE TABLE Archive(
-    idArchive SERIAL PRIMARY KEY,
-    operation varchar check ( operation in ('PROPOSITION','ETUDE','ATTRIBUER','PARTCICIPER','CLOTURE') ),
-    idProjet integer references Projet(idProjet) ON DELETE CASCADE,
-    dateArchive TIMESTAMP
-
-);
-
-CREATE TABLE AttribuerLocal(
-  idLocal integer references Local(idLocal) ON DELETE CASCADE,
-  idProjet integer references Projet(idProjet) ON DELETE CASCADE,
-  dateAttribution timestamp,
   primary key (idLocal,idProjet)
 );

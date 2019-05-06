@@ -128,9 +128,12 @@ $$ language plpgsql;
 
 -- verifie si Developpeur
 CREATE OR REPLACE FUNCTION estDeveloppeur(idP INTEGER) RETURNS BOOLEAN AS $$
+DECLARE
+  n INTEGER;
 BEGIN
-    RETURN (0 < (SELECT count(*) FROM Developpeur
-            WHERE idPersonne = idP));
+    SELECT count(*) INTO n FROM Developpeur
+    WHERE idDeveloppeur = idP;
+    RETURN (0 < n);
 END;
 $$ language plpgsql;
 
@@ -138,7 +141,7 @@ $$ language plpgsql;
 CREATE OR REPLACE FUNCTION estBeneficaire(idB INTEGER) RETURNS BOOLEAN AS $$
 BEGIN
     RETURN (0 < (SELECT count(*) FROM Beneficiaire
-            WHERE idPersonne = idB));
+            WHERE idBeneficiare = idB));
 END;
 $$ language plpgsql;
 
@@ -155,7 +158,7 @@ CREATE OR REPLACE FUNCTION changementStatuDev(idD INTEGER) RETURNS VOID AS $$
 BEGIN
     with p as (
       SELECT * FROM Developpeur
-      WHERE idPersonne = idD
+      WHERE idDeveloppeur = idD
     )
     INSERT INTO Expert (idPersonne, nom, prenom, email, dateEmbauche, fonction)
     VALUES (p.idPersonne, p.nom, p.prenom, p.email, getCurrentDate(), 'CODEUR');
@@ -163,7 +166,7 @@ BEGIN
     RAISE NOTICE 'Le Developpeur % Integre notre équipe de CODEUR', idD;
 
     DELETE FROM Developpeur
-    WHERE idPersonne = idD;
+    WHERE idDeveloppeur = idD;
 END;
 $$ language plpgsql;
 
@@ -172,7 +175,7 @@ CREATE OR REPLACE FUNCTION changementStatuBenef(idB INTEGER) RETURNS VOID AS $$
 BEGIN
     with p as (
       SELECT * FROM Beneficiaire
-      WHERE idPersonne = idB
+      WHERE idBeneficiare = idB
     )
 
     INSERT INTO Expert (idPersonne, nom, prenom, email, dateEmbauche, fonction)
@@ -181,7 +184,7 @@ BEGIN
     RAISE NOTICE 'Le beneficiaire % Integre notre équipe de DECISION', idB;
 
     DELETE FROM Beneficiaire
-    WHERE idPersonne = idB;
+    WHERE idBeneficiare = idB;
 END;
 $$ language plpgsql;
 

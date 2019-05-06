@@ -6,7 +6,7 @@ CREATE OR REPLACE FUNCTION fOnProjet() RETURNS TRIGGER AS $$
 BEGIN
     IF (TG_OP = 'DELETE') THEN
 
-        INSERT INTO Archive SELECT 'SUPRESSION', getCurrentDate(), OLD.idProjet;
+        INSERT INTO Archive (operation, dateArchive, idProjet) VALUES ('SUPRESSION', getCurrentDate(), OLD.idProjet);
         RETURN NULL;
 
     ELSIF (TG_OP = 'UPDATE') THEN
@@ -31,7 +31,7 @@ DECLARE
   nbProjet INTEGER;
 BEGIN
 
-    INSERT INTO Archive SELECT 'PROPOSITION', getCurrentDate(), NEW.*;
+    INSERT INTO Archive (operation, dateArchive, idProjet) VALUES ('PROPOSITION', getCurrentDate(), NEW.idProjet);
 
     UPDATE Personne SET nombreProjet = nombreProjet + 1
                     WHERE idPersonne = NEW.idBeneficiare;
@@ -53,9 +53,11 @@ CREATE TRIGGER tOnProposer
 -- avant INSERT Proposer si beneficiaire
 CREATE OR REPLACE FUNCTION fAvantProposer() RETURNS TRIGGER AS $$
 BEGIN
-    IF (!estBeneficaire(OLD.idPersonne)) THEN
+    IF (NOT estBeneficaire(NEW.idBeneficiare)::BOOLEAN) THEN
+        RAISE notice 'not not';
         RETURN NULL;
     END IF;
+    RETURN NEW;
 END;
 $$ language plpgsql;
 
