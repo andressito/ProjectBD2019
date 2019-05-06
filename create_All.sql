@@ -30,7 +30,7 @@ CREATE TABLE Expert(
 )INHERITS (Personne);
 
 CREATE TABLE Developpeur(
-  status VARCHAR DEFAULT 'Debutant'
+  status VARCHAR DEFAULT 'DEBUTANT'
 )INHERITS (Personne);
 
 CREATE TABLE Beneficiaire(
@@ -50,7 +50,7 @@ CREATE TABLE Projet(
 CREATE TABLE Local(
   idLocal  SERIAL PRIMARY KEY,
   capacite INTEGER,
-  libre  boolean default TRUE
+  libre    boolean default TRUE
 );
 
 CREATE TABLE EtudeProjet(
