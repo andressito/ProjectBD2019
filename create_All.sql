@@ -24,17 +24,21 @@ CREATE TABLE Personne(
 );
 
 CREATE TABLE Expert(
+  idExpert SERIAL PRIMARY KEY,
   dateEmbauche timestamp,
-  salaire      INTEGER NOT NULL DEFAULT 2000,
-  fonction     varchar not null check (fonction in ('DECISION','CODEUR'))
+  salaire INTEGER NOT NULL,
+  fonction varchar not null check ( fonction in ('DECISION','CODEUR'))
 )INHERITS (Personne);
 
 CREATE TABLE Developpeur(
-  status VARCHAR DEFAULT 'DEBUTANT'
+  idDeveloppeur SERIAL PRIMARY KEY,
+  status VARCHAR DEFAULT 'Debutant'
 )INHERITS (Personne);
 
 CREATE TABLE Beneficiaire(
-  benefice integer default 0
+    idBeneficiare SERIAL PRIMARY KEY,
+    status VARCHAR DEFAULT 'Debutant',
+    benefice integer default 0
 )INHERITS (Personne);
 
 CREATE TABLE Projet(
@@ -48,9 +52,10 @@ CREATE TABLE Projet(
 );
 
 CREATE TABLE Local(
-  idLocal  SERIAL PRIMARY KEY,
-  capacite INTEGER,
-  libre    boolean default TRUE
+  idLocal SERIAL PRIMARY KEY,
+  capacite INTEGER not null,
+  nom VARCHAR not null,
+  libre boolean default false
 );
 
 CREATE TABLE EtudeProjet(
