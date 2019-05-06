@@ -5,9 +5,9 @@ CREATE OR REPLACE FUNCTION libererLocal(idL INTEGER, etat BOOLEAN) RETURNS VOID 
 BEGIN
 
     IF (etat) THEN
-    RAISE notice 'le local % est libre', idL;
+        RAISE notice 'le local % est libre', idL;
     ELSE
-    RAISE notice 'le local % est occupé', idL;
+        RAISE notice 'le local % est occupé', idL;
     END IF;
 
     UPDATE Local SET libre = etat
@@ -21,7 +21,7 @@ CREATE OR REPLACE FUNCTION estAttribuer(idP INTEGER) RETURNS BOOLEAN AS $$
 BEGIN
     RETURN (0 < (SELECT count(*) FROM AttribuerLocal
             WHERE idProjet = idP)
-          );
+           );
 END;
 $$ language plpgsql;
 
