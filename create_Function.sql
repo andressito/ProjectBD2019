@@ -133,6 +133,7 @@ DECLARE
 BEGIN
     SELECT count(*) INTO n FROM Developpeur
     WHERE idDeveloppeur = idP;
+    
     RETURN (0 < n);
 END;
 $$ language plpgsql;
@@ -155,13 +156,15 @@ $$ language plpgsql;
 
 -- changement status dev integre Expert as CODEUR
 CREATE OR REPLACE FUNCTION changementStatuDev(idD INTEGER) RETURNS VOID AS $$
+DECLARE
+    p Developpeur%ROWTYPE;
 BEGIN
-    with p as (
-      SELECT * FROM Developpeur
-      WHERE idDeveloppeur = idD
-    )
-    INSERT INTO Expert (idPersonne, nom, prenom, email, dateEmbauche, fonction)
-    VALUES (p.idPersonne, p.nom, p.prenom, p.email, getCurrentDate(), 'CODEUR');
+
+    SELECT * INTO p FROM Developpeur
+    WHERE idDeveloppeur = idD;
+
+    INSERT INTO Expert (nom, prenom, email, dateEmbauche, fonction)
+    VALUES (p.nom, p.prenom, p.email, getCurrentDate(), 'CODEUR');
 
     RAISE NOTICE 'Le Developpeur % Integre notre équipe de CODEUR', idD;
 
@@ -172,14 +175,16 @@ $$ language plpgsql;
 
 -- changement status beneficiaire integre Expert as DECISION
 CREATE OR REPLACE FUNCTION changementStatuBenef(idB INTEGER) RETURNS VOID AS $$
+DECLARE
+    p Beneficiaire%ROWTYPE;
 BEGIN
-    with p as (
-      SELECT * FROM Beneficiaire
-      WHERE idBeneficiare = idB
-    )
 
-    INSERT INTO Expert (idPersonne, nom, prenom, email, dateEmbauche, fonction)
-    VALUES (p.idPersonne, p.nom, p.prenom, p.email, getCurrentDate(), 'DECISION');
+    SELECT * INTO p FROM Beneficiaire
+    WHERE idBeneficiare = idB;
+
+
+    INSERT INTO Expert (nom, prenom, email, dateEmbauche, fonction)
+    VALUES (p.nom, p.prenom, p.email, getCurrentDate(), 'DECISION');
 
     RAISE NOTICE 'Le beneficiaire % Integre notre équipe de DECISION', idB;
 

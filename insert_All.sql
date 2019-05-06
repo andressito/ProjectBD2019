@@ -1,3 +1,5 @@
+insert into dateCourante values (now());
+
 insert into expert ( nom, prenom, email, nombreprojet, dateembauche, fonction)
 values ('keny','andre','andrekeny@gmail.com','10','2018-06-05 20:00:00','CODEUR');
 insert into expert ( nom, prenom, email, nombreprojet, dateembauche, fonction)
@@ -32,3 +34,6 @@ insert into Projet (nom,description) values ('jeu de dame','application de jeu d
 
 --Proposer
 insert into Proposer values (1, 1, '2018-06-05 20:00:00');
+
+-- ETUDE
+insert INTO EtudeProjet values(1, 1, FALSE, now(), 10000, 3);  

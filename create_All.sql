@@ -58,7 +58,7 @@ CREATE TABLE Local(
 );
 
 CREATE TABLE EtudeProjet(
-  idExpert    integer REFERENCES  Personne(idPersonne) ON DELETE CASCADE,
+  idExpert    integer REFERENCES  Expert(idExpert) ON DELETE CASCADE,
   idProjet    integer REFERENCES Projet(idProjet) ON DELETE CASCADE,
   decision    boolean not null,
   dateEtude   TIMESTAMP not null,
@@ -84,7 +84,7 @@ create table Proposer(
 
 CREATE TABLE Archive(
   idArchive   SERIAL PRIMARY KEY,
-  operation   varchar check (operation in ('PROPOSITION','ETUDE','ATTRIBUTION','PARTICIPATION','CLOTURE','SUPRESSION')),
+  operation   varchar check (operation in ('PROPOSITION','ETUDE','ATTRIBUTION','PARTICIPATION','CLOTURE')),
   dateArchive TIMESTAMP,
   idProjet    integer references Projet(idProjet) ON DELETE CASCADE
 );

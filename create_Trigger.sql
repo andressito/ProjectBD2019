@@ -5,8 +5,7 @@ CREATE OR REPLACE FUNCTION fOnProjet() RETURNS TRIGGER AS $$
 
 BEGIN
     IF (TG_OP = 'DELETE') THEN
-
-        INSERT INTO Archive (operation, dateArchive, idProjet) VALUES ('SUPRESSION', getCurrentDate(), OLD.idProjet);
+        RAISE notice 'projet % supprimé',OLD.idProjet;
         RETURN NULL;
 
     ELSIF (TG_OP = 'UPDATE') THEN
@@ -68,9 +67,8 @@ CREATE TRIGGER tAvantProposer
 -- après Etude
 CREATE OR REPLACE FUNCTION apresEtude() RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO Archive SELECT 'ETUDE', getCurrentDate(), NEW.*;
     IF (NEW.decision) THEN
-        INSERT INTO AttribuerLocal SELECT getCurrentDate(), NEW.idLocal, NEW.idProjet;
+        INSERT INTO Archive (operation, dateArchive, idProjet) VALUES ('ETUDE', getCurrentDate(), NEW.idProjet);
         RETURN NEW;
     ELSE
         DELETE FROM Projet
@@ -81,7 +79,7 @@ END;
 $$ language plpgsql;
 
 CREATE TRIGGER tApresEtude
-    AFTER INSERT ON EtudeProjet
+    BEFORE INSERT ON EtudeProjet
     FOR EACH ROW EXECUTE PROCEDURE apresEtude();
 
 -- après ATTRIBUTION local occupé
