@@ -77,10 +77,10 @@ CREATE TABLE Participer(
 );
 
 create table Proposer(
-  idBeneficiare integer references Personne(idPersonne)ON DELETE CASCADE,
-  idProjet      integer references Projet(idProjet) ON DELETE CASCADE,
-  dateProp      timestamp,
-  PRIMARY KEY (idBeneficiare,idProjet)
+    idbeneficiare integer references beneficiaire(idbeneficiare)ON DELETE CASCADE,
+    idProjet integer references Projet(idProjet) ON DELETE CASCADE,
+    date timestamp,
+    PRIMARY KEY (idbeneficiare,idProjet)
 );
 
 CREATE TABLE Archive(
