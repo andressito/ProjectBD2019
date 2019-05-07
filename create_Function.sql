@@ -65,7 +65,9 @@ BEGIN
         SELECT idLocal INTO local FROM AttribuerLocal
         WHERE idProjet = idP;
 
-        INSERT INTO Archive VALUES ('CLOTURE', getCurrentDate(), idP);
+        INSERT INTO Archive (operation, dateArchive, idProjet) VALUES ('CLOTURE', getCurrentDate(), idP);
+
+        RAISE NOTICE 'projet % CLOS',idP;
         PERFORM libererLocal(local, TRUE);
 
         DELETE FROM AttribuerLocal

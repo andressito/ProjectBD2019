@@ -125,11 +125,11 @@ BEGIN
     FOR idP IN SELECT idProjet FROM EtudeProjet
       LOOP
           SELECT dateDebut INTO dbPr FROM Projet;
-          PERFORM verifierProjet(idP);
           PERFORM verifierLocal(idP, dbPr, now);
+          PERFORM verifierProjet(idP);
     END LOOP;
 
-    RETURN NULL;
+    RETURN NEW;
 END;
 $$ language plpgsql;
 

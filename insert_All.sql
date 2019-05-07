@@ -29,27 +29,5 @@ insert into Local (nom,capacite) values ('Rome','25');
 --Projet
 insert into Projet (nom,description,dateDebut, dateFin) values ('coavionnage','site de coavionnage pour mettre en relations pilotes
   et passagers','2018-06-05 20:00:00',now());
-insert into Projet (nom,description, dateDebut, dateFin) values ('lecteur RSS','application pour lire les flux rss','2018-06-05 20:00:00',now());
-insert into Projet (nom,description, dateDebut, dateFin) values ('jeu de dame','application de jeu de dame et echec','2018-06-05 20:00:00',now());
-
---Proposer
-insert into Proposer values (1, 1, '2018-06-05 20:00:00');
-insert into Proposer values (2, 2, '2018-06-05 20:00:00');
-insert into Proposer values (3, 2, '2018-06-05 20:00:00');
-
--- ETUDE
-insert INTO EtudeProjet values(2, 1, FALSE, now(), 10000, 3);
-
-insert INTO EtudeProjet values(2, 2, TRUE, now(), 10000, 3);
-insert INTO EtudeProjet values(2, 3, TRUE, now(), 10000, 3);
-
--- ATTRIBUTION local
-insert INTO AttribuerLocal values(now(), 1, 2);
-insert INTO AttribuerLocal values(now(), 1, 3);
-
-
--- Participer
-insert into Participer values (10, 2, now(), 20);
-
--- mis a jour date
-UPDATE dateCourante SET dateCourante = now();
+insert into Projet (nom,description, dateDebut, dateFin) values ('lecteur RSS','application pour lire les flux rss','2018-06-05 20:00:00','2019-06-05 20:00:00');
+insert into Projet (nom,description, dateDebut, dateFin) values ('jeu de dame','application de jeu de dame et echec','2018-06-05 20:00:00','2019-07-05 20:00:00');
