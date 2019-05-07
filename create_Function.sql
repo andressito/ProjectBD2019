@@ -35,7 +35,7 @@ BEGIN
     SELECT EXTRACT(MONTH FROM now::TIMESTAMP) INTO moisNow;
 
     IF (moisDbP = moisNow) THEN
-        IF(!estAttribuer(idP)) THEN
+        IF(NOT estAttribuer(idP)) THEN
             RAISE notice 'Projet % non attribué à un local !!', idP;
         END IF;
     END IF;
@@ -74,9 +74,11 @@ BEGIN
         IF (reussite(idP)) THEN
             SELECT idBeneficiare INTO idB FROM Proposer
             WHERE idProjet = idP;
+
             RAISE NOTICE 'Projet % reussi', idP;
-            UPDATE Beneficiaire SET benefice = (budget*0.4)
-            WHERE idPersonne = idB;
+
+            UPDATE Beneficiaire SET benefice = (budgetP*0.4)
+            WHERE idBeneficiare = idB;
             RAISE NOTICE 'benefice touché!!';
         ELSE
             RAISE NOTICE 'Projet % echoué', idP;
@@ -91,7 +93,7 @@ $$ language plpgsql;
 CREATE OR REPLACE FUNCTION misAjourStatuDev(idP INTEGER, s VARCHAR) RETURNS VOID AS $$
 BEGIN
     UPDATE Developpeur SET status = s
-    WHERE idPersonne = idP;
+    WHERE idDeveloppeur = idP;
 END;
 $$ language plpgsql;
 
@@ -133,7 +135,7 @@ DECLARE
 BEGIN
     SELECT count(*) INTO n FROM Developpeur
     WHERE idDeveloppeur = idP;
-    
+
     RETURN (0 < n);
 END;
 $$ language plpgsql;
@@ -196,18 +198,21 @@ $$ language plpgsql;
 -- si projet reussi
 CREATE OR REPLACE FUNCTION reussite(idP INTEGER) RETURNS BOOLEAN AS $$
 DECLARE
-  budgetP  INTEGER;
   budgetEt INTEGER;
+  budgetP  INTEGER;
+
 BEGIN
     SELECT budget INTO budgetP FROM Projet
     WHERE idProjet = idP;
+
     SELECT budget INTO budgetEt FROM EtudeProjet
     WHERE idProjet = idP;
 
-    IF (budgetEt <= budgetP) THEN
-      RETURN TRUE;
-    ELSE
+
+    IF ((budgetEt- budgetP) > 0) THEN
       RETURN FALSE;
+    ELSE
+      RETURN TRUE;
     END IF;
 END;
 $$ language plpgsql;

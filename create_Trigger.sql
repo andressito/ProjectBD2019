@@ -13,7 +13,7 @@ BEGIN
         IF (reussite(NEW.idProjet)) THEN
             RAISE notice 'budget atteint!!';
         ELSE
-            RAISE notice 'don reçu % $ restant', (budgetEt - budgetP);
+            RAISE notice 'don reçu';
         END IF;
     END IF;
     RETURN NULL;
@@ -85,7 +85,7 @@ CREATE TRIGGER tApresEtude
 -- après ATTRIBUTION local occupé
 CREATE OR REPLACE FUNCTION apresAttribution() RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO Archive SELECT 'ATTRIBUTION', getCurrentDate(), NEW.idProjet;
+    INSERT INTO Archive (operation, dateArchive, idProjet) VALUES ('ATTRIBUTION', getCurrentDate(), NEW.idProjet);
     PERFORM libererLocal(NEW.idLocal, FALSE);
     RETURN NEW;
 END;
@@ -93,16 +93,17 @@ $$ language plpgsql;
 
 CREATE TRIGGER tApresAttribution
     AFTER INSERT ON AttribuerLocal
-    FOR EACH ROW EXECUTE PROCEDURE apresEtude();
+    FOR EACH ROW EXECUTE PROCEDURE apresAttribution();
 
 
 -- avant ATTRIBUTION check localEstLibre
 CREATE OR REPLACE FUNCTION avantAttribution() RETURNS TRIGGER AS $$
 BEGIN
-    IF (localEstLibre(OLD.idLocal)) THEN
+    IF (localEstLibre(NEW.idLocal)) THEN
+        RAISE NOTICE 'local % libre bien attribué',NEW.idLocal;
         RETURN NEW;
     ELSE
-        RAISE NOTICE 'local % occupé',OLD.idLocal;
+        RAISE NOTICE 'local % occupé pas attirbué',NEW.idLocal;
         RETURN NULL;
     END IF;
 END;
@@ -110,7 +111,7 @@ $$ language plpgsql;
 
 CREATE TRIGGER tAvantAttribution
     BEFORE INSERT ON AttribuerLocal
-    FOR EACH ROW EXECUTE PROCEDURE apresEtude();
+    FOR EACH ROW EXECUTE PROCEDURE avantAttribution();
 
 -- mis à jour apès changement de date
 CREATE OR REPLACE FUNCTION misAjour() RETURNS TRIGGER AS $$
@@ -121,12 +122,14 @@ DECLARE
 BEGIN
     SELECT dateCourante INTO now FROM DateCourante;
 
-    FOR idP IN SELECT idProjet FROM EtudeProjet WHERE Conclue=FALSE AND Date_Prop < temps_courant() - 24*INTERVAL '1 hour'
+    FOR idP IN SELECT idProjet FROM EtudeProjet
       LOOP
           SELECT dateDebut INTO dbPr FROM Projet;
           PERFORM verifierProjet(idP);
           PERFORM verifierLocal(idP, dbPr, now);
     END LOOP;
+
+    RETURN NULL;
 END;
 $$ language plpgsql;
 
@@ -139,9 +142,9 @@ CREATE OR REPLACE FUNCTION participation() RETURNS TRIGGER AS $$
 
 BEGIN
 
-    INSERT INTO Archive SELECT 'PARTICIPATION', getCurrentDate(), NEW.idProjet;
+    INSERT INTO Archive (operation, dateArchive, idProjet) VALUES ('PARTICIPATION', getCurrentDate(), NEW.idProjet);
 
-    UPDATE Projet SET budget = (budget + NEW.don)
+    UPDATE Projet SET budget = budget + NEW.don
     WHERE idProjet = NEW.idProjet;
 
     IF (estDeveloppeur(NEW.idPersonne)) THEN

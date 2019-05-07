@@ -46,15 +46,14 @@ CREATE TABLE Projet(
   description VARCHAR NOT NULL,
   dateDebut   TIMESTAMP,
   dateFin     TIMESTAMP,
-  budget      INTEGER DEFAULT 0,
-  reussite    boolean default false
+  budget      INTEGER DEFAULT 0
 );
 
 CREATE TABLE Local(
   idLocal SERIAL PRIMARY KEY,
   capacite INTEGER not null,
   nom VARCHAR not null,
-  libre boolean default false
+  libre boolean default true
 );
 
 CREATE TABLE EtudeProjet(
@@ -76,8 +75,8 @@ CREATE TABLE Participer(
 );
 
 create table Proposer(
-    idbeneficiare integer references beneficiaire(idbeneficiare)ON DELETE CASCADE,
     idProjet integer references Projet(idProjet) ON DELETE CASCADE,
+    idbeneficiare integer references beneficiaire(idbeneficiare)ON DELETE CASCADE,
     date timestamp,
     PRIMARY KEY (idbeneficiare,idProjet)
 );
